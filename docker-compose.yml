@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:14
+    restart: unless-stopped
+    container_name: ${DOCKER_CONTAINER}
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${HOST_PORT}:5432"
+    volumes:
+      - postgres_countries_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - countries-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    container_name: pgadmin-de-task
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pgadmin_countries_data:/var/lib/pgadmin
+    networks:
+      - countries-net
+
+volumes:
+  postgres_countries_data:
+  pgadmin_countries_data:
+
+networks:
+  countries-net:
